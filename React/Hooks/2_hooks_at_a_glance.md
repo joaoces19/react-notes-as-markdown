@@ -3,26 +3,26 @@
 * We call it inside a function component to add some local state to it. React will preserve this state between re-renders. `useState` returns a pair: the current state value and a function that lets you update it.
 
 ```jsx
-import React, { useState, useEffect } from 'react';
+  import React, { useState, useEffect } from 'react';
 
-function Example() {
-  const [count, setCount] = useState(0);
+  function Example() {
+    const [count, setCount] = useState(0);
 
-  // Similar to componentDidMount and componentDidUpdate:
-  useEffect(() => {
-    // Update the document title using the browser API
-    document.title = `You clicked ${count} times`;
-  });
+    // Similar to componentDidMount and componentDidUpdate:
+    useEffect(() => {
+      // Update the document title using the browser API
+      document.title = `You clicked ${count} times`;
+    });
 
-  return (
-    <div>
-      <p>You clicked {count} times</p>
-      <button onClick={() => setCount(count + 1)}>
-        Click me
-      </button>
-    </div>
-  );
-}
+    return (
+      <div>
+        <p>You clicked {count} times</p>
+        <button onClick={() => setCount(count + 1)}>
+          Click me
+        </button>
+      </div>
+    );
+  }
 ```
 
 * The only argument to `useState` is the initial state.
@@ -36,28 +36,28 @@ function Example() {
 * Effects may also optionally specify how to “clean up” after them by returning a function.
 
 ```jsx
-import React, { useState, useEffect } from 'react';
+  import React, { useState, useEffect } from 'react';
 
-function FriendStatus(props) {
-  const [isOnline, setIsOnline] = useState(null);
+  function FriendStatus(props) {
+    const [isOnline, setIsOnline] = useState(null);
 
-  function handleStatusChange(status) {
-    setIsOnline(status.isOnline);
+    function handleStatusChange(status) {
+      setIsOnline(status.isOnline);
+    }
+
+    useEffect(() => {
+      ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+
+      return () => {
+        ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+      };
+    });
+
+    if (isOnline === null) {
+      return 'Loading...';
+    }
+    return isOnline ? 'Online' : 'Offline';
   }
-
-  useEffect(() => {
-    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
-
-    return () => {
-      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
-    };
-  });
-
-  if (isOnline === null) {
-    return 'Loading...';
-  }
-  return isOnline ? 'Online' : 'Offline';
-}
 ```
 
 * **Rules of Hooks** 
@@ -70,22 +70,22 @@ function FriendStatus(props) {
 * Custom Hooks are more of a convention than a feature. If a function’s name starts with ”use” and it calls other Hooks, we say it is a custom Hook
 
 ```jsx
-import React, { useState, useEffect } from 'react';
+  import React, { useState, useEffect } from 'react';
 
-function useFriendStatus(friendID) {
-  const [isOnline, setIsOnline] = useState(null);
+  function useFriendStatus(friendID) {
+    const [isOnline, setIsOnline] = useState(null);
 
-  function handleStatusChange(status) {
-    setIsOnline(status.isOnline);
+    function handleStatusChange(status) {
+      setIsOnline(status.isOnline);
+    }
+
+    useEffect(() => {
+      ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
+      return () => {
+        ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
+      };
+    });
+
+    return isOnline;
   }
-
-  useEffect(() => {
-    ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
-    return () => {
-      ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
-    };
-  });
-
-  return isOnline;
-}
 ```
